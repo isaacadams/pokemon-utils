@@ -3,6 +3,15 @@ mod pokedex;
 
 fn main() {
     println!("Hello, world!");
-    assert_eq!(pokedex::BULBASAUR.index, 1);
-    assert_eq!(pokedex::MEWTWO.index, 150);
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn pokedex_is_valid() {
+        assert_eq!(pokedex::BULBASAUR.index, 1);
+        assert_eq!(pokedex::MEWTWO.index, 150);
+    }
 }
