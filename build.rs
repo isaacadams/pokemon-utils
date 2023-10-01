@@ -46,7 +46,13 @@ fn main() {
 fn create_pokedex_entry(index: u16, name: &str) -> String {
     format!(
         "pub const {}: &'static PokedexEntry = &PokedexEntry {{ index: {}, name: \"{}\" }};\n",
-        name.replace(" ", "_")
+        name
+            // Mr. Mime, Type: Null
+            .replace(" ", "_")
+            // [-]: Nidoran-M / Nidoran-F
+            // [']: Farfetch'd
+            // [:]: Type: Null
+            // [.]: Mr. Mime
             .replace(&['-', '\'', ':', '.'], "")
             .to_uppercase(),
         index,
