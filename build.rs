@@ -22,13 +22,17 @@ fn create_pokedex() {
 
     stream
         .write(
-            "pub struct PokedexEntry {
-        pub index: u16,
-        pub name: &'static str,
-    }\n"
+            "
+#[derive(Debug,PartialEq)]
+pub struct PokedexEntry {
+    pub index: u16,
+    pub name: &'static str,
+}\n"
             .as_ref(),
         )
         .unwrap();
+
+    let mut identifiers = Vec::new();
 
     let mut index: u16 = 1;
     loop {
@@ -38,27 +42,45 @@ fn create_pokedex() {
         }
 
         let pokemon = pokemon.unwrap();
-        let entry = create_pokedex_entry(index, pokemon);
+        let (entry, identifier) = create_pokedex_entry(index, pokemon);
+        identifiers.push(identifier);
         stream.write(entry.as_ref()).unwrap();
         index += 1;
     }
 
+    stream
+        .write(format!("pub const MAX: usize = {};", identifiers.len()).as_ref())
+        .unwrap();
+
+    stream
+        .write(
+            format!(
+                "pub const ENTRIES: &'static [&PokedexEntry; {}] = &[{}];",
+                identifiers.len(),
+                identifiers.join(",")
+            )
+            .as_ref(),
+        )
+        .unwrap();
+
     stream.flush().unwrap();
 }
 
-fn create_pokedex_entry(index: u16, name: &str) -> String {
-    format!(
-        "pub const {}: &'static PokedexEntry = &PokedexEntry {{ index: {}, name: \"{}\" }};\n",
-        name
-            // Mr. Mime, Type: Null
-            .replace(" ", "_")
-            // [-]: Nidoran-M / Nidoran-F
-            // [']: Farfetch'd
-            // [:]: Type: Null
-            // [.]: Mr. Mime
-            .replace(&['-', '\'', ':', '.'], "")
-            .to_uppercase(),
-        index,
-        name
+fn create_pokedex_entry(index: u16, name: &str) -> (String, String) {
+    let identifier = name
+        // Mr. Mime, Type: Null
+        .replace(" ", "_")
+        // [-]: Nidoran-M / Nidoran-F
+        // [']: Farfetch'd
+        // [:]: Type: Null
+        // [.]: Mr. Mime
+        .replace(&['-', '\'', ':', '.'], "")
+        .to_uppercase();
+    (
+        format!(
+            "pub const {}: &'static PokedexEntry = &PokedexEntry {{ index: {}, name: \"{}\" }};\n",
+            identifier, index, name
+        ),
+        identifier,
     )
 }
