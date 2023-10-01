@@ -1,5 +1,6 @@
 use std::fs;
 use std::io::prelude::*;
+use std::process::Command;
 
 fn main() {
     let file = fs::read_to_string("./pokemon.txt").unwrap();
@@ -38,6 +39,8 @@ fn main() {
     }
 
     stream.flush().unwrap();
+
+    Command::new("cargo").arg("fmt").spawn().unwrap();
 }
 
 fn create_pokedex_entry(index: u16, name: &str) -> String {
@@ -50,5 +53,3 @@ fn create_pokedex_entry(index: u16, name: &str) -> String {
         name
     )
 }
-
-// Sirfetch'd
