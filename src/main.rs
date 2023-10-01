@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 mod pokedex;
+mod rates;
 
 fn main() {
     println!("Hello, world!");

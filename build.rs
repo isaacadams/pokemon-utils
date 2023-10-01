@@ -3,6 +3,11 @@ use std::io::prelude::*;
 use std::process::Command;
 
 fn main() {
+    create_pokedex();
+    Command::new("cargo").arg("fmt").spawn().unwrap();
+}
+
+fn create_pokedex() {
     let file = fs::read_to_string("./pokemon.txt").unwrap();
     let mut all_pokemon = file.lines();
 
@@ -39,8 +44,6 @@ fn main() {
     }
 
     stream.flush().unwrap();
-
-    Command::new("cargo").arg("fmt").spawn().unwrap();
 }
 
 fn create_pokedex_entry(index: u16, name: &str) -> String {
