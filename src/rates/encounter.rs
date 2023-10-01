@@ -1,4 +1,5 @@
 use crate::pokedex;
+use rand::Rng;
 
 const MYTHICAL: &'static [u16] = &[
     pokedex::MEW.index,
@@ -30,11 +31,28 @@ const SUB_LEGENDARY: &'static [u16] = &[
     pokedex::LATIOS.index,
 ];
 
+// generates random number between 0 and 100
+// lower numbers are more rare
+// number determines which bucket to draw from
+// then randomly draws pokemon from bucket
+pub fn encounter_random_pokemon() -> u16 {
+    // larger numbers are more rare
+    let gen = generate_random_encounter();
+    let bucket = match gen {
+        8.. => {
+            return *pick_random_item_from(&generate_all_none_rare_pokemon());
+        }
+        5..=7 => SUB_LEGENDARY,
+        2..=4 => LEGENDARY,
+        0..=1 => MYTHICAL,
+    };
+
+    *pick_random_item_from(bucket)
+}
+
 pub fn is_rare(no: &u16) -> bool {
     SUB_LEGENDARY.contains(no) || LEGENDARY.contains(no) || MYTHICAL.contains(no)
 }
-
-use rand::Rng;
 
 fn pick_random_item_from<T>(items: &[T]) -> &T {
     let length = items.len();
@@ -42,9 +60,14 @@ fn pick_random_item_from<T>(items: &[T]) -> &T {
     &items[random_index]
 }
 
+/// this will return a range of numbers from 0 to 100
+/// 0 is rare
+/// 100 is common
 fn generate_random_encounter() -> u8 {
     let mut rng = rand::thread_rng();
-    let exponent = 0.55; // Adjust this value to control the distribution shape (higher values make 100 more common)
+    // adjust this value to control the distribution shape
+    // the lower values make 100 more common
+    let exponent = 0.55;
 
     // Generate a random float between 0.0 and 1.0 and apply the power-law distribution
     let random_float = rng.gen::<f64>();
@@ -59,20 +82,6 @@ fn generate_all_none_rare_pokemon() -> Vec<u16> {
         // filter out rare pokemon
         .filter(|no| !is_rare(no))
         .collect()
-}
-
-pub fn encounter_random_pokemon() -> u16 {
-    let gen = generate_random_encounter();
-    let bucket = match gen {
-        8.. => {
-            return *pick_random_item_from(&generate_all_none_rare_pokemon());
-        }
-        5..=7 => SUB_LEGENDARY,
-        2..=4 => LEGENDARY,
-        0..=1 => MYTHICAL,
-    };
-
-    *pick_random_item_from(bucket)
 }
 
 #[cfg(test)]

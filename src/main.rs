@@ -3,6 +3,7 @@ use pokedex::PokedexEntry;
 #[allow(dead_code)]
 mod pokedex;
 mod rates;
+mod types;
 
 impl PokedexEntry {
     pub fn get_by_id(no: usize) -> Option<&'static PokedexEntry> {
