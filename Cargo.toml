@@ -2,6 +2,15 @@
 name = "pokemon-utils"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = """
+a collection of pokemon related utilities
+
+Project homepage: https://github.com/isaacadams/pokemon-utils
+"""
+readme = "README.md"
+homepage = "https://github.com/isaacadams/pokemon-utils"
+repository = "https://github.com/isaacadams/pokemon-utils"
 
 [lib]
 path = "src/lib.rs"
