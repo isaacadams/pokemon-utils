@@ -76,9 +76,9 @@ fn generate_random_encounter() -> u8 {
     result
 }
 
-// only including up to 3rd gen pokemon
 fn generate_all_none_rare_pokemon() -> Vec<u16> {
-    (1..=386)
+    // include all up to last 3rd gen pokemon
+    (pokedex::BULBASAUR.index..=pokedex::DEOXYS.index)
         // filter out rare pokemon
         .filter(|no| !is_rare(no))
         .collect()

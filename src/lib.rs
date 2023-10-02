@@ -15,6 +15,17 @@ impl PokedexEntry {
     }
 }
 
+impl TryFrom<u16> for &'static PokedexEntry {
+    type Error = ();
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match PokedexEntry::get_by_id(value as usize) {
+            Some(entry) => Ok(entry),
+            None => Err(()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
