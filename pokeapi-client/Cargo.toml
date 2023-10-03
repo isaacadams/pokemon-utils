@@ -2,6 +2,14 @@
 name = "pokeapi-client"
 version = "0.1.0"
 edition = "2021"
+description = """
+pokeapi api client
+
+Project homepage: https://github.com/isaacadams/pokemon-utils
+"""
+readme = "README.md"
+homepage = "https://github.com/isaacadams/pokemon-utils"
+repository = "https://github.com/isaacadams/pokemon-utils"
 
 [lib]
 path = "src/lib.rs"
