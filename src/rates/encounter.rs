@@ -67,7 +67,7 @@ fn generate_random_encounter() -> u8 {
     let mut rng = rand::thread_rng();
     // adjust this value to control the distribution shape
     // the lower values make 100 more common
-    let exponent = 0.55;
+    let exponent = 0.45;
 
     // Generate a random float between 0.0 and 1.0 and apply the power-law distribution
     let random_float = rng.gen::<f64>();
@@ -139,7 +139,7 @@ mod test {
         let mut integers = Vec::new();
         let mut floats = Vec::new();
 
-        for _ in 0..1_000 {
+        for _ in 0..10_000 {
             let random_number = generate_random_encounter();
             integers.push(random_number);
             floats.push(random_number as f32);
@@ -149,14 +149,14 @@ mod test {
 
         println!("{} 8..", integers.iter().filter(|n| **n >= 8).count());
         println!(
-            "{} 5..=7",
+            "{} Sub-Legendary",
             integers.iter().filter(|n| **n >= 5 && **n <= 7).count()
         );
         println!(
-            "{} 2..=4",
+            "{} Legendary",
             integers.iter().filter(|n| **n >= 2 && **n <= 4).count()
         );
-        println!("{} 0..=1", integers.iter().filter(|n| **n <= 1).count());
+        println!("{} Mythical", integers.iter().filter(|n| **n <= 1).count());
     }
 
     fn plot(nums: &[f32]) -> Result<(), Box<dyn std::error::Error>> {
