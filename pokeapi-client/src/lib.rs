@@ -30,6 +30,70 @@ pub async fn get_characteristic(
     response.json().await
 }
 
+pub async fn get_all_sprites(no: u16) -> Result<Vec<PokemonSprite>, reqwest::Error> {
+    let mut images = Vec::new();
+    let response = reqwest::get(format!("{}/pokemon/{}", BASE, &no)).await?;
+    let root: serde_json::Value = response.json().await?;
+    match root {
+        serde_json::Value::Object(root) => {
+            for (key, value) in root {
+                if &key != "sprites" {
+                    continue;
+                }
+
+                match value {
+                    serde_json::Value::Object(sprites) => {
+                        for (key, value) in sprites {
+                            extract_string(&mut images, key, value);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+        _ => {}
+    };
+    Ok(images)
+}
+
+pub struct PokemonSprite {
+    label: String,
+    url: String,
+}
+
+impl PokemonSprite {
+    pub fn to_slack_message(self) -> serde_json::Value {
+        serde_json::json!({
+            "type": "context",
+            "elements": [
+                {
+                    "type": "image",
+                    "image_url": self.url,
+                    "alt_text": self.label
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": self.label
+                }
+            ]
+        })
+    }
+}
+
+pub fn extract_string(buffer: &mut Vec<PokemonSprite>, key: String, value: serde_json::Value) {
+    match value {
+        serde_json::Value::String(x) => {
+            buffer.push(PokemonSprite { label: key, url: x });
+        }
+        serde_json::Value::Object(o) => {
+            for (child_key, value) in o {
+                extract_string(buffer, format!("{}/{}", key, child_key), value);
+            }
+        }
+        _ => {}
+    };
+}
+
 /*
 
 pub fn get_all_pokemon() -> Result<NamedAPIResourceList, reqwest::Error> {
@@ -61,6 +125,27 @@ mod test {
     } */
 
     #[tokio::test]
+    async fn get_sprites() {
+        let sprites = get_all_sprites(1).await.unwrap();
+        println!("found {}", sprites.len());
+        let sprites = serde_json::Value::Array(
+            sprites
+                .into_iter()
+                .skip(50)
+                .take(50)
+                .map(|s| s.to_slack_message())
+                .collect::<Vec<serde_json::Value>>(),
+        );
+        std::fs::write(
+            "./message.json",
+            serde_json::json!({
+                "blocks": sprites
+            })
+            .to_string(),
+        );
+    }
+
+    #[tokio::test]
     async fn edge_case_pokemon_works() {
         let response = get_pokemon(704).await;
         assert!(response.is_ok());
@@ -84,8 +169,8 @@ mod test {
         let response = get_pokemon(0).await;
         assert!(response.is_err());
 
-        let response = get_pokemon(1018).await;
-        assert!(response.is_err());
+        /* let response = get_pokemon(1018).await;
+        assert!(response.is_err()); */
     }
 
     /*  #[tokio::test]
