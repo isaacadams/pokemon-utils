@@ -56,7 +56,7 @@ pub fn is_rare(no: &u16) -> bool {
 
 fn pick_random_item_from<T>(items: &[T]) -> &T {
     let length = items.len();
-    let random_index = rand::thread_rng().gen_range(0..length);
+    let random_index = rand::rng().random_range(0..length);
     &items[random_index]
 }
 
@@ -64,13 +64,13 @@ fn pick_random_item_from<T>(items: &[T]) -> &T {
 /// 0 is rare
 /// 100 is common
 fn generate_random_encounter() -> u8 {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     // adjust this value to control the distribution shape
     // the lower values make 100 more common
     let exponent = 0.45;
 
     // Generate a random float between 0.0 and 1.0 and apply the power-law distribution
-    let random_float = rng.gen::<f64>();
+    let random_float = rng.random::<f64>();
     let result = (random_float.powf(exponent) * 100.0) as u8;
 
     result
